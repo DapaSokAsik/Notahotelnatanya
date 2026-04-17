@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOTA HOTEL KANG</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: #eef1f5;
+}
+
+/* HEADER */
+.header {
+  background: #2c3e50;
+  color: white;
+  padding: 15px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* MENU */
+.menu {
+  display: flex;
+  overflow-x: auto;
+  background: white;
+  padding: 10px;
+  gap: 10px;
+}
+
+.menu button {
+  border: none;
+  padding: 10px 15px;
+  border-radius: 20px;
+  background: #ddd;
+  cursor: pointer;
+  transition: 0.3s;
+  white-space: nowrap;
+}
+
+.menu button.active {
+  background: #2c3e50;
+  color: white;
+}
+
+.menu button:hover {
+  transform: scale(1.05);
+}
+
+/* CONTAINER */
+.container {
+  padding: 15px;
+  padding-bottom: 110px; 
+}
+
+/* CARD */
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeIn 0.3s forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.info {
+  flex: 1;
+}
+
+.nama {
+  font-weight: bold;
+}
+
+.harga {
+  font-size: 13px;
+  color: gray;
+}
+
+input {
+  width: 60px;
+  text-align: center;
+}
+
+.total-item {
+  width: 90px;
+  text-align: center;
+  font-weight: bold;
+}
+
+/* FOOTER */
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: white;
+  padding: 15px;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+}
+
+.total {
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">NOTA HOTEL KANG</div>
+
+<div class="menu" id="menu"></div>
+
+<div class="container" id="listBarang"></div>
+
+<div class="footer">
+  <div class="total">Total: Rp <span id="grandTotal">0</span></div>
+</div>
+
+<script>
+const dataHotel = {
+  "ASTON": [
+    { nama: "BM", harga: 1350 },
+    { nama: "BT BIASA", harga: 1750 },
+    { nama: "BT PUTIH", harga: 1750 },
+    { nama: "DVD", harga: 3200 },
+    { nama: "DVS", harga: 3000 },
+    { nama: "DS", harga: 2200 },
+    { nama: "SS", harga: 1900 },
+    { nama: "PT", harga: 2000 }
+  ],
+  "SWISBELL": [
+    { nama: "DVS", harga: 3000 },
+    { nama: "SS", harga: 2200 },
+    { nama: "DVK", harga: 3300 },
+  ],
+   "GM": [
+    { nama: "HT", harga: 1750 },
+    { nama: "PT", harga: 2150 },
+    { nama: "BV Black", harga: 1600 },
+    { nama: "TC Red", harga: 2750 },
+    { nama: "TC Gold", harga: 2750 },
+    { nama: "TC Marron", harga: 2750 },
+    { nama: "TC Combi", harga: 2750 },
+    { nama: "TC Black", harga: 2750 },
+    { nama: "CC", harga: 2000 }
+  ],
+  "SUNAN": [
+    { nama: "DVD", harga: 3300 },
+    { nama: "DVS", harga: 2900 },
+    { nama: "DS", harga: 2500 },
+    { nama: "SS", harga: 2000 },
+    { nama: "DVD VIP", harga: 3300 },
+    { nama: "PC PO", harga: 950 },
+    { nama: "BC PO", harga: 950 }
+  ],
+  "KUSUMA SAHID": [
+    { nama: "BT", harga: 1650 },
+    { nama: "BM", harga: 1200 },
+    { nama: "PCK", harga: 1000 },
+    { nama: "PCB", harga: 1100 }
+  ],
+};
+
+let currentData = [];
+const container = document.getElementById("listBarang");
+const menu = document.getElementById("menu");
+
+function formatRupiah(angka) {
+  return angka.toLocaleString("id-ID");
+}
+
+/* BUAT MENU */
+Object.keys(dataHotel).forEach((hotel, index) => {
+  let btn = document.createElement("button");
+  btn.innerText = hotel;
+
+  if (index === 0) btn.classList.add("active");
+
+  btn.onclick = () => {
+    document.querySelectorAll(".menu button").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    loadHotel(hotel);
+  };
+
+  menu.appendChild(btn);
+});
+
+/* LOAD HOTEL */
+function loadHotel(namaHotel) {
+  currentData = dataHotel[namaHotel];
+  container.innerHTML = "";
+  document.getElementById("grandTotal").innerText = "0";
+
+  currentData.forEach((item, i) => {
+    let card = document.createElement("div");
+    card.className = "card";
+
+    card.innerHTML = `
+      <div class="info">
+        <div class="nama">${item.nama}</div>
+        <div class="harga">Rp ${formatRupiah(item.harga)}</div>
+      </div>
+      <input type="number" min="0" value="0" id="jumlah${i}">
+      <div class="total-item" id="total${i}">0</div>
+    `;
+
+    container.appendChild(card);
+
+    document.getElementById(`jumlah${i}`).addEventListener("input", hitung);
+  });
+}
+
+/* HITUNG */
+function hitung() {
+  let grandTotal = 0;
+
+  currentData.forEach((item, i) => {
+    let jumlah = parseInt(document.getElementById(`jumlah${i}`).value) || 0;
+    let total = jumlah * item.harga;
+
+    document.getElementById(`total${i}`).innerText = formatRupiah(total);
+    grandTotal += total;
+  });
+
+  document.getElementById("grandTotal").innerText = formatRupiah(grandTotal);
+}
+
+/* LOAD AWAL */
+loadHotel(Object.keys(dataHotel)[0]);
+</script>
+
+</body>
+</html>
